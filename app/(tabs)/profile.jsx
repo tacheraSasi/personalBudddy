@@ -41,7 +41,7 @@ export default function Profile() {
         </ScrollView>
       </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.buttonEdit} onPress={() => { Linking.openURL('https://ekilie.com'); }}>
+            <TouchableOpacity style={styles.buttonEdit} onPress={() => { Linking.openURL(`https://ekilie.com/room.php?user_id=${user?.unique_id}`)}}>
               <Text style={styles.buttonText}>Edit Profile ✏️</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.buttonLogout} onPress={logout}>

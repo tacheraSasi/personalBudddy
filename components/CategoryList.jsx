@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import Colors from '../utils/Colors'
 import { useRouter } from 'expo-router'
+import failed from '../assets/failed.png'
 
-export default function CategoryList({categoryList}) {
+export default function CategoryList({categoryList, fetchFailed}) {
 
     const router=useRouter();
     const onCategoryClick=(category)=>{
@@ -50,6 +51,25 @@ export default function CategoryList({categoryList}) {
                 </View>
             </TouchableOpacity>
         ))}
+        {fetchFailed&&
+           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+           <Image source={failed} style={{
+             height:200,
+             width:200,
+             borderRadius:12,
+             borderColor:'transparent'
+           }}/>
+           <Text style={{
+             margin:20,
+             fontSize:20,
+             fontWeight:'bold',
+             color:'gray',
+             textAlign:'center'
+           }}>
+             Something went wrong 😕
+           </Text>
+         </View>
+        }
       </View>
     </View>
   )

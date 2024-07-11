@@ -3,15 +3,14 @@ import React, { useEffect, useRef, useState } from 'react'
 import {Link,useRouter} from 'expo-router'
 import {supabase} from './../../utils/SupabaseConfig'
 import services from './../../utils/services'
-import { client } from './../../utils/KindeConfig';
 import Header from '../../components/Header'
 import Colors from './../../utils/Colors'
 import CircularChart from '../../components/CircularChart'
 import { Ionicons } from '@expo/vector-icons';
 import CategoryList from '../../components/CategoryList'
 import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
 import Counts from '../../components/Counts'
+import axios from 'axios'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -32,6 +31,7 @@ export default function Home() {
     const notificationListener = useRef();
     const responseListener = useRef();
     const [pushToken, setPushToken] = useState(null)
+    const [fetchFailed, setFetchFailed] = useState(false)
 
     useEffect(()=>{
         checkUserAuth();
@@ -75,23 +75,33 @@ export default function Home() {
     }
 
     
-
-  const getCategoryList=async()=>{
-    setLoading(true)
-    const user=JSON.parse(await services.getData('user'));
-    setCurrentUser(user)
-    console.log(currentUser.fname)
+    const getCategoryList = async () => {
+      setLoading(true);
+      const user = JSON.parse(await services.getData('user'));
+      setCurrentUser(user);
+      console.log("Current user",currentUser.email);
     
-    const {data,error}=await supabase.from('Category')
-    .select('*,CategoryItems(*)')
-    .eq('created_by',user.email)
-    .order(['id'],{ascending:false})
-    ;
-
-    // console.log("Data",data) 
-    setCategoryList(data);
-    data&&setLoading(false)
-  }
+      try {
+        const response = await axios.post('https://api.ekilie.com/getCategoryList.php', {
+          email: user.email
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json', // Setting the content type to JSON
+          },
+        });
+        console.log(response)  
+        const data = response.data;  
+        console.log(data)
+    
+        setCategoryList(data);
+        data && setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        setLoading(false);
+        setFetchFailed(true)
+      }
+    };
   StatusBar.setBackgroundColor(Colors.PRIMARY);
   StatusBar.setBarStyle('light-content');
   return (
@@ -121,7 +131,7 @@ export default function Home() {
              }}>
               <CircularChart categoryList={categoryList} />
               <Counts />
-              <CategoryList categoryList={categoryList} />
+              <CategoryList categoryList={categoryList} fetchFailed={fetchFailed}/>
              </View>
              
           
