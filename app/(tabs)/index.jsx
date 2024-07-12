@@ -74,34 +74,59 @@ export default function Home() {
         }
     }
 
-    
     const getCategoryList = async () => {
       setLoading(true);
-      const user = JSON.parse(await services.getData('user'));
-      setCurrentUser(user);
-      console.log("Current user",currentUser.email);
+      setFetchFailed(false);
     
       try {
-        const response = await axios.post('https://api.ekilie.com/getCategoryList.php', {
-          email: user.email
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json', // Setting the content type to JSON
-          },
-        });
-        console.log(response)  
-        const data = response.data;  
-        console.log(data)
+        const user = JSON.parse(await services.getData('user'));
     
+        const { data, error } = await supabase.from('Category')
+          .select('*,CategoryItems(*)')
+          .eq('created_by', user.email)
+          .order('id', { ascending: false });
+    
+        if (error) {
+          throw error;
+        }
+    
+        console.log("Data", data);
         setCategoryList(data);
-        data && setLoading(false);
       } catch (error) {
         console.error("Error fetching data: ", error);
+        setFetchFailed(true);
+      } finally {
         setLoading(false);
-        setFetchFailed(true)
       }
     };
+    
+    // const getCategoryList = async () => {
+    //   setLoading(true);
+    //   const user = JSON.parse(await services.getData('user'));
+    //   setCurrentUser(user);
+    //   console.log("Current user",currentUser.email);
+    
+    //   try {
+    //     const response = await axios.post('https://api.ekilie.com/getCategoryList.php', {
+    //       email: user.email
+    //     },
+    //     {
+    //       headers: {
+    //         'Content-Type': 'application/json', // Setting the content type to JSON
+    //       },
+    //     });
+    //     console.log(response)  
+    //     const data = response.data;  
+    //     console.log(data)
+    
+    //     setCategoryList(data.categories);
+    //     data && setLoading(false);
+    //   } catch (error) {
+    //     console.error("Error fetching data: ", error);
+    //     setLoading(false);
+    //     setFetchFailed(true)
+    //   }
+    // };
   StatusBar.setBackgroundColor(Colors.PRIMARY);
   StatusBar.setBarStyle('light-content');
   return (
