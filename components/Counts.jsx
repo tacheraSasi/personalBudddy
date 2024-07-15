@@ -66,7 +66,7 @@ export default function Counts() {
   }
 
   const handlePress = (message) => {
-    setModalMessage(message);
+    setModalMessage(message);//
     setModalVisible(true);
   };
 
