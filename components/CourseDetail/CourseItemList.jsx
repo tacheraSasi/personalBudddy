@@ -31,7 +31,7 @@ export default function CourseItemList({categoryData,setUpdateRecord}) {
             <TouchableOpacity key={index} 
             style={{
                 flexDirection: 'row',
-                backgroundColor:getRandomBgColor(),
+                backgroundColor:'#eeeded',//getRandomBgColor(),
                 borderRadius:15,
                 justifyContent: 'space-between',
                 alignItems: 'center',

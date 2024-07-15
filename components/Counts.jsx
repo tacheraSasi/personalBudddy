@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Modal, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import Colors from '../utils/Colors'; // Make sure to adjust the path as necessary
+import Colors from '../utils/Colors'; 
+import axios from 'axios'
 
 export default function Counts() {
-  const [userCount, setUserCount] = useState(0);
+  const [usersCount, setUsersCount] = useState(0);
   const [insightsCount, setInsightsCount] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
@@ -12,9 +13,9 @@ export default function Counts() {
   const animatedInsightsCount = new Animated.Value(0);
 
   useEffect(() => {
-    // Simulate fetching counts from an API
-    const fetchedUserCount = 100; // Example number
-    const fetchedInsightsCount = 50; // Example number
+    fetchCounts()
+    const fetchedUserCount = usersCount; 
+    const fetchedInsightsCount = insightsCount; 
 
     Animated.timing(animatedUserCount, {
       toValue: fetchedUserCount,
@@ -29,7 +30,7 @@ export default function Counts() {
     }).start();
 
     animatedUserCount.addListener(({ value }) => {
-      setUserCount(Math.floor(value));
+      setUsersCount(Math.floor(value));
     });
 
     animatedInsightsCount.addListener(({ value }) => {
@@ -41,6 +42,28 @@ export default function Counts() {
       animatedInsightsCount.removeAllListeners();
     };
   }, []);
+  const fetchCounts = async ()=>{
+    try {
+      // Fetch Users Count
+      const usersResponse = await axios.get('http://console.ekilie.com/api/getUsersCount.php');
+      const usersData = usersResponse.data;
+      console.log(usersResponse.data)
+      setUsersCount(usersData.users);
+
+      // Fetch Insights Count
+      const insightsResponse = await axios.get('http://console.ekilie.com/api/getInsightsCount.php');
+      const insightsData = insightsResponse.data;
+      console.log(insightsResponse.data)
+      setInsightsCount(insightsData.insights);
+
+      
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      
+    }
+
+
+  }
 
   const handlePress = (message) => {
     setModalMessage(message);
@@ -55,7 +78,7 @@ export default function Counts() {
       >
         <MaterialIcons name="person" size={24} color="#5f9c6c" />
         <Text style={styles.text1}>
-          {userCount} Users
+          {usersCount} Users
         </Text>
       </TouchableOpacity>
 
